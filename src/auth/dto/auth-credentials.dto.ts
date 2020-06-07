@@ -1,12 +1,6 @@
 import { IsString, MinLength, MaxLength, Matches } from "class-validator";
 
-const checkLower = '(?=.*[a-z])'
-const checkUpper = '(?=.*[A-Z])'
-const checkNumber = '(?=.*\d)'
-const checkSymbol = '(?=.*?[#?!@$%^&*-])'
-
-const passwordRegex = new RegExp(`${checkLower}${checkUpper}${checkNumber}${checkSymbol}`, "g")
-
+const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*?[-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/])[a-zA-Z0-9-!$%^&*()_+|~=`{}\[\]:";'<>?,.\/]*/
 
 export class AuthCredentialsDto {
   @IsString()
@@ -17,6 +11,6 @@ export class AuthCredentialsDto {
   @IsString()
   @MinLength(8)
   @MaxLength(32)
-  @Matches(passwordRegex, { message: "password is too weak. " })
+  @Matches(regex, { message: "password is too weak. " })
   password: string;
 }
