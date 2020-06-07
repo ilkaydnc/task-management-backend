@@ -9,12 +9,6 @@ export class UserRepository extends Repository<User> {
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto
 
-    const exist = this.findOne({ username })
-
-    if (exist) {
-      //
-    }
-
     const user = new User()
 
     user.username = username
@@ -23,13 +17,24 @@ export class UserRepository extends Repository<User> {
 
     try {
       await user.save()
-
     } catch (error) {
       if (error.code == "23505") {
         throw new ConflictException("Username is already exists!")
       } else {
         throw new InternalServerErrorException()
       }
+    }
+  }
+
+  async validateUserPassword(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+    const { username, password } = authCredentialsDto
+
+    const user = await this.findOne({ username })
+
+    if (user && await user.validatePassword(password)) {
+      return user.password
+    } else {
+      return null
     }
   }
 
