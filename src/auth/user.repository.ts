@@ -1,11 +1,12 @@
 import { Repository, EntityRepository } from "typeorm";
 import { User } from "./user.entity";
 import { AuthCredentialsDto } from "./dto/auth-credentials.dto";
-import { ConflictException, InternalServerErrorException } from "@nestjs/common";
+import { ConflictException, InternalServerErrorException, Logger } from "@nestjs/common";
 import * as bcrypt from "bcrypt"
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
+  private logger = new Logger("UserRepository")
   async signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
     const { username, password } = authCredentialsDto
 
@@ -21,6 +22,7 @@ export class UserRepository extends Repository<User> {
       if (error.code == "23505") {
         throw new ConflictException("Username is already exists!")
       } else {
+        this.logger.error(`Failed to sign up. Credentials: ${JSON.stringify(authCredentialsDto)}`, error)
         throw new InternalServerErrorException()
       }
     }
